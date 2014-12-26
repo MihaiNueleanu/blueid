@@ -1,0 +1,74 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0099cc">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView"
+        android:src="@drawable/ic_logo"
+        android:layout_marginBottom="400dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="Username"
+        android:ems="10"
+        android:id="@+id/Username"
+        android:layout_marginTop="120dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/Password"
+        android:layout_alignStart="@+id/Password"
+        android:textColor="#ffffff"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/Password"
+        android:text="Password"
+        android:textColor="#ffffff"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/Username"
+        android:layout_centerHorizontal="true" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#ffffffff"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/Password"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center_horizontal|top"
+        android:id="@+id/MessageArea">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="In order to activate your account fill in your username and password"
+            android:id="@+id/Message"
+            android:gravity="top|center"
+            android:layout_marginTop="20dp"
+            android:textColor="#0099cc"
+            android:textSize = "30dp"></TextView>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:text="Login"
+            android:id="@+id/login"
+            android:layout_gravity="center_horizontal|bottom"
+            android:textSize="20dp" />
+    </FrameLayout>
+
+
+</RelativeLayout>
