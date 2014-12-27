@@ -63,6 +63,8 @@ public class MainActivity extends ActionBarActivity {
 
                             out.print(command);
 
+                            //todo receive commands from the python server via BufferedReader in
+
                             //close socket and connection
                             out.close();
                             in.close();
