@@ -1,5 +1,6 @@
 package com.blueid.blueid.blueid;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,13 +29,18 @@ public class MainActivity extends ActionBarActivity {
     int port = 9999;
     int timeout = 5000;
 
+    private Button button;
+    private EditText Username,Password;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         //Login button
-        final Button button = (Button) findViewById(R.id.login);
+        button = (Button) findViewById(R.id.login);
+        //other widgets
+        Username = (EditText)findViewById(R.id.Username);
+        Password = (EditText)findViewById(R.id.Password);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
@@ -42,8 +49,6 @@ public class MainActivity extends ActionBarActivity {
                     public void run() {
                         try {
                             //get input username and password
-                            EditText Username = (EditText)findViewById(R.id.Username);
-                            EditText Password = (EditText)findViewById(R.id.Password);
                             String usernamevalue = Username.getText().toString();
                             String passwordvalue = Password.getText().toString();
 
@@ -70,12 +75,19 @@ public class MainActivity extends ActionBarActivity {
                             in.close();
                             socket.close();
 
-                        } catch (UnknownHostException e) {
+                            startActivity(new Intent(getApplicationContext(), MainActivity2.class));
+
+                        } catch (Exception e) {
                             System.err.println("Unknown Host.");
-                        } catch (IOException e) {
                             e.printStackTrace();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            final Exception e2 = e;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast toast = Toast.makeText(getApplicationContext(), "Error connecting: " + e2.getMessage(), Toast.LENGTH_LONG);
+                                    toast.show();
+                                    }
+                            });
                         }
                     }
                 }).start();
