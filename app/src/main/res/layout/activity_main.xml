@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
         android:background="#0099cc"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_vertical">
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,7 +50,8 @@
         android:layout_weight="1.2"
         android:background="#ffffffff"
         android:id="@+id/MessageArea"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <TextView
             android:layout_width="match_parent"
