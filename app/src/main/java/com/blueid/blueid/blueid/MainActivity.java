@@ -25,7 +25,8 @@ import java.net.UnknownHostException;
 public class MainActivity extends ActionBarActivity {
 
     //Host, port, timeout
-    String host = "192.168.0.102";
+    String host = "192.168.0.107";
+    //String host = "10.0.2.2";
     int port = 9999;
     int timeout = 5000;
 
@@ -75,7 +76,9 @@ public class MainActivity extends ActionBarActivity {
                             in.close();
                             socket.close();
 
-                            startActivity(new Intent(getApplicationContext(), MainActivity2.class));
+                            Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
+                            intent.putExtra("user",usernamevalue);
+                            startActivity(intent);
 
                         } catch (Exception e) {
                             System.err.println("Unknown Host.");

@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your account is active for"
+            android:text="Your remaining time is"
             android:gravity="top|center"
             android:textSize = "20sp"
           />
@@ -36,36 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize = "50sp"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="h "
-                android:textSize = "50sp"
-                />
-            <TextView
-                android:id="@+id/tv_m"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize = "50sp"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="m "
-                android:textSize = "50sp"
-                />
-            <TextView
-                android:id="@+id/tv_s"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize = "50sp"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="s "
-                android:textSize = "50sp"
+
                 />
 
 
@@ -90,7 +61,7 @@
             android:layout_weight="10"/>
 
         <Button
-            android:id="@+id/login"
+            android:id="@+id/logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Log out"
