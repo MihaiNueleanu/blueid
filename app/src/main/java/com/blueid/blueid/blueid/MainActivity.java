@@ -29,6 +29,9 @@ public class MainActivity extends ActionBarActivity {
     //String host = "10.0.2.2";
     int port = 9999;
     int timeout = 5000;
+    Socket socket;
+    PrintWriter out;
+    BufferedReader in;
 
     private Button button;
     private EditText Username,Password;
@@ -54,10 +57,10 @@ public class MainActivity extends ActionBarActivity {
                             String passwordvalue = Password.getText().toString();
 
                             //connect to socket
-                            Socket socket = new Socket();
+                            socket = new Socket();
                             socket.connect(new InetSocketAddress(host, port), timeout);
-                            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            out = new PrintWriter(socket.getOutputStream(), true);
+                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                             //create JSON from username and password and send
                             JSONObject  command = new JSONObject();
@@ -70,15 +73,18 @@ public class MainActivity extends ActionBarActivity {
                             out.print(command);
 
                             //todo receive commands from the python server via BufferedReader in
+//                              String line = null;
+//                            while ((line = in.readLine()) != null) {
+//                            Log.d("Goku", line);}
 
-                            //close socket and connection
-                            out.close();
-                            in.close();
-                            socket.close();
+                        //close socket and connection
+                        out.close();
+                        in.close();
+                        socket.close();
+                        Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
+                        //TODO remove comment intent.putExtra("user",usernamevalue);
+                        startActivity(intent);
 
-                            Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
-                            intent.putExtra("user",usernamevalue);
-                            startActivity(intent);
 
                         } catch (Exception e) {
                             System.err.println("Unknown Host.");
