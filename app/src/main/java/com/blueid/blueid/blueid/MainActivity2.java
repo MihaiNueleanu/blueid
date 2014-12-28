@@ -2,6 +2,8 @@ package com.blueid.blueid.blueid;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
@@ -10,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +31,13 @@ public class MainActivity2 extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isOnline())
+                    //here we would send a logout request to the server
                 finish();
+                else {
+                    Toast toast = Toast.makeText(getApplicationContext(), "No internet access", Toast.LENGTH_LONG);
+                    toast.show();
+                }
             }
         });
         tvh= (TextView) findViewById(R.id.tv_h);
@@ -66,7 +75,12 @@ public class MainActivity2 extends ActionBarActivity {
         editor.putLong("timeleft", timeleft);
         editor.commit();
     }
-
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
