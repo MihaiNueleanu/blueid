@@ -1,12 +1,15 @@
 package com.blueid.blueid.blueid;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -25,15 +28,15 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
+import com.blueid.blueid.blueid.LocalService.MyBinder;
+
 
 
 public class LoggedInActivity extends ActionBarActivity {
+    MyBinder clientBinder;
+    LocalService mLocalService;
+    boolean mBound = false;
 
-    //Host, port, timeout
-    String host = "192.168.43.164";
-    //String host = "10.0.2.2";
-    int port = 9999;
-    int timeout = 5000;
     Socket socket;
     PrintWriter out;
     BufferedReader in;
@@ -44,10 +47,33 @@ public class LoggedInActivity extends ActionBarActivity {
     private Button button;
     private SharedPreferences sharedPreferences;
     private long timeleft;
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            clientBinder = (MyBinder) service;
+            mLocalService = clientBinder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_activity2);
+
+        Log.d("Goku","In LoggedInOnCreate: "+getIntent().getStringExtra("SessionKey"));
+        //here we start the bg service
+        startBoundService();
+
 
         button = (Button) findViewById(R.id.logout);
         button.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +85,7 @@ public class LoggedInActivity extends ActionBarActivity {
                     new Thread(new Runnable() {
                         public void run() {
                             try { //get input username and password
-                                String usernamevalue = getIntent().getStringExtra("user");
+                                String usernamevalue = getIntent().getStringExtra("Username");
                                 //create JSON from username and password and send
                                 JSONObject command = new JSONObject();
                                 JSONObject params = new JSONObject();
@@ -67,7 +93,7 @@ public class LoggedInActivity extends ActionBarActivity {
                                 command.put("command", "logout");
                                 command.put("params", params);
 
-                                socket = new Socket(host, port);
+                                socket = new Socket(Utility.ServerIP, Utility.ServerPort);
                                 PrintStream out = new PrintStream(socket.getOutputStream(), true);
                                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                                 //out.write(("How are you?").getBytes());
@@ -87,6 +113,12 @@ public class LoggedInActivity extends ActionBarActivity {
                                 Log.d("Goku", "socket input shut down ");
                                 Log.d("Goku", "Response received: " + response);
                                 if (response.equals("true")) {
+
+                                    //TODO here we stop the bk service on logout
+                                    stopService(new Intent(getApplicationContext(),LocalService.class));
+                                    if(mBound)
+                                    unbindService(mConnection);
+
                                     finish();
                                 }
 
@@ -105,7 +137,7 @@ public class LoggedInActivity extends ActionBarActivity {
                                     try {
                                         socket.close();
                                     } catch (IOException e) {
-                                        // TODO Auto-generated catch block
+
                                         e.printStackTrace();
                                     }
                                 }
@@ -150,6 +182,31 @@ public class LoggedInActivity extends ActionBarActivity {
 
 
     }
+
+    //helper method that starts and binds the service
+   /*TODO important ! If you only need to interact with the service while your activity
+   is visible, you should bind during onStart() and unbind during onStop(). */
+    private void startBoundService() {
+        //start the service in a new thread so it won't interrupt the UI
+        Thread t = new Thread(){
+            public void run(){
+//                create the intent
+                Intent intent = new Intent(getApplicationContext(), LocalService.class);
+                intent.putExtra("Username", getIntent().getStringExtra("Username"));//add userID and SessionKey
+                intent.putExtra("SessionKey", getIntent().getStringExtra("SessionKey"));
+                //start the LocalService
+
+                startService(intent);
+                // Bind to LocalService
+                getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);//BIND_AUTO_CREATE creates the service if not already there
+
+                Log.d("Goku", "Started and bound the service !");
+            }
+        };
+        t.start();
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

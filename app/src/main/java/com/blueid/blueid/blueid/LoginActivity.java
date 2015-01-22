@@ -26,14 +26,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+
 public class LoginActivity extends ActionBarActivity {
 
 
-    //Host, port, timeout
-    String host = "192.168.43.164";
-    //String host = "10.0.2.2";
-    int port = 9999;
-    int timeout = 5000;
     Socket socket;
     PrintWriter out;
     BufferedReader in;
@@ -68,7 +64,7 @@ public class LoginActivity extends ActionBarActivity {
                             command.put("command", "login");
                             command.put("params", params);
 
-                            socket = new Socket(host,port);
+                            socket = new Socket(Utility.ServerIP,Utility.ServerPort);
                             PrintStream out = new PrintStream(socket.getOutputStream(), true);
                             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                             //out.write(("How are you?").getBytes());
@@ -87,9 +83,12 @@ public class LoginActivity extends ActionBarActivity {
                             }
                             Log.d("Goku", "socket input shut down ");
                             Log.d("Goku", "Response received: "+ response);
-                            if(response.equals("true")) {
+                            if(!response.equals("false")) { //if a session key is received
+
+
                                 Intent intent = new Intent(getApplicationContext(), LoggedInActivity.class);
-                                intent.putExtra("user", usernamevalue);
+                                intent.putExtra("Username", usernamevalue);
+                                intent.putExtra("SessionKey",response);
                                 startActivity(intent);
                             }
                             else {
@@ -117,7 +116,7 @@ public class LoginActivity extends ActionBarActivity {
                                 try {
                                     socket.close();
                                 } catch (IOException e) {
-                                    // TODO Auto-generated catch block
+
                                     e.printStackTrace();
                                 }
                             }}
@@ -132,6 +131,8 @@ public class LoginActivity extends ActionBarActivity {
             }
         });
     }
+
+
 
     public boolean isOnline() {
         ConnectivityManager cm =
