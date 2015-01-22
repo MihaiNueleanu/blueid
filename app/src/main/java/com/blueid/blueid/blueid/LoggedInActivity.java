@@ -71,7 +71,9 @@ public class LoggedInActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main_activity2);
 
         Log.d("Goku","In LoggedInOnCreate: "+getIntent().getStringExtra("SessionKey"));
+
         //here we start the bg service
+        if(!LocalService.isRunning)
         startBoundService();
 
 
@@ -115,10 +117,10 @@ public class LoggedInActivity extends ActionBarActivity {
                                 if (response.equals("true")) {
 
                                     //TODO here we stop the bk service on logout
-                                    stopService(new Intent(getApplicationContext(),LocalService.class));
+
                                     if(mBound)
                                     unbindService(mConnection);
-
+                                    stopService(new Intent(getApplicationContext(),LocalService.class));
                                     finish();
                                 }
 
@@ -190,7 +192,8 @@ public class LoggedInActivity extends ActionBarActivity {
         //start the service in a new thread so it won't interrupt the UI
         Thread t = new Thread(){
             public void run(){
-//                create the intent
+                Log.d("GokuContext","in StartBoundService" + getApplicationContext());
+            // create the intent
                 Intent intent = new Intent(getApplicationContext(), LocalService.class);
                 intent.putExtra("Username", getIntent().getStringExtra("Username"));//add userID and SessionKey
                 intent.putExtra("SessionKey", getIntent().getStringExtra("SessionKey"));
@@ -198,7 +201,8 @@ public class LoggedInActivity extends ActionBarActivity {
 
                 startService(intent);
                 // Bind to LocalService
-                getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);//BIND_AUTO_CREATE creates the service if not already there
+                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);//BIND_AUTO_CREATE creates the service if not already there
+
 
                 Log.d("Goku", "Started and bound the service !");
             }
