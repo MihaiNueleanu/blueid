@@ -54,9 +54,33 @@ public class LoggedInActivity extends ActionBarActivity {
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
+            Log.d("Goku","We've bound to localservice");
             clientBinder = (MyBinder) service;
             mLocalService = clientBinder.getService();
             mBound = true;
+
+            final String FORMAT = "%02d:%02d:%02d";
+            if(mBound)
+                timeleft = mLocalService.getTimeLeft();
+            else timeleft = 32400000;
+            CountDownTimer cdt = new CountDownTimer(timeleft, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    timeleft = millisUntilFinished;
+                    tvh.setText(""+String.format(FORMAT,
+                            TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
+                            TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
+                                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+                            TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(
+                                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
+                }
+
+                public void onFinish() {
+                    tvh.setText("-not activated-");
+                    message.setText("Your account has been deactivated !");
+                }
+            }.start();
+
         }
 
         @Override
@@ -72,9 +96,9 @@ public class LoggedInActivity extends ActionBarActivity {
 
         Log.d("Goku","In LoggedInOnCreate: "+getIntent().getStringExtra("SessionKey"));
 
-        //here we start the bg service
-        if(!LocalService.isRunning)
-        startBoundService();
+//        //here we start the bg service
+//        if(!LocalService.isRunning)
+//        startBoundService();
 
 
         button = (Button) findViewById(R.id.logout);
@@ -158,33 +182,43 @@ public class LoggedInActivity extends ActionBarActivity {
         });
         tvh= (TextView) findViewById(R.id.tv_h);
         message = (TextView) findViewById(R.id.Message);
-        final String FORMAT = "%02d:%02d:%02d";
-        sharedPreferences = getSharedPreferences(getIntent().getStringExtra("user"), Context.MODE_PRIVATE);
+//        final String FORMAT = "%02d:%02d:%02d";
+        //sharedPreferences = getSharedPreferences(getIntent().getStringExtra("user"), Context.MODE_PRIVATE);
 
         //if (sharedPreferences.contains("timeleft"))
 
-        timeleft = sharedPreferences.getLong("timeleft", 32400000); // default 9 hours
-        CountDownTimer cdt = new CountDownTimer(timeleft, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                timeleft = millisUntilFinished;
-                tvh.setText(""+String.format(FORMAT,
-                        TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
-                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
-                                TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
-                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(
-                                TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
-            }
-
-            public void onFinish() {
-                tvh.setText("-not activated-");
-                message.setText("Your account has been deactivated !");
-            }
-        }.start();
+      //  timeleft = sharedPreferences.getLong("timeleft", 32400000); // default 9 hours
+//        if(mBound)
+//        timeleft = mLocalService.getTimeLeft();
+//        else timeleft = 32400000;
+//        CountDownTimer cdt = new CountDownTimer(timeleft, 1000) {
+//
+//            public void onTick(long millisUntilFinished) {
+//                timeleft = millisUntilFinished;
+//                tvh.setText(""+String.format(FORMAT,
+//                        TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
+//                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
+//                                TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+//                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(
+//                                TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
+//            }
+//
+//            public void onFinish() {
+//                tvh.setText("-not activated-");
+//                message.setText("Your account has been deactivated !");
+//            }
+//        }.start();
 
 
     }
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //here we start the bg service
+        //TODO need to check here
+        //if(!LocalService.isRunning)
+            startBoundService();
+    }
     //helper method that starts and binds the service
    /*TODO important ! If you only need to interact with the service while your activity
    is visible, you should bind during onStart() and unbind during onStop(). */
@@ -199,6 +233,9 @@ public class LoggedInActivity extends ActionBarActivity {
                 intent.putExtra("SessionKey", getIntent().getStringExtra("SessionKey"));
                 //start the LocalService
 
+                //this is more like a hack, if the activity has been started by the service, you
+                //know the service is already on, so you don't start it again, just bind to it
+                if(getIntent().getLongExtra("Timeleft",0)==0)
                 startService(intent);
                 // Bind to LocalService
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);//BIND_AUTO_CREATE creates the service if not already there
@@ -214,9 +251,9 @@ public class LoggedInActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong("timeleft", timeleft);
-        editor.commit();
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putLong("timeleft", timeleft);
+//        editor.commit();
     }
     public boolean isOnline() {
         ConnectivityManager cm =
